@@ -6,10 +6,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
+
 import java.util.ArrayList;
 
 
-//affichage d'un personnage par son id
+
 @Controller
 public class PersonnageController
 {
@@ -60,9 +62,19 @@ public class PersonnageController
     @GetMapping(value ="personList")
     public ArrayList<Personnage> afficherListePersonnages(Model model)
     {
-        model.addAttribute("persons", listPersonnages);
+        RestTemplate restTemplate = new RestTemplate();
 
-        return listPersonnages;
+        // On créé un tableau vide pour récupérer le résultat du serveur
+        ArrayList<Personnage> resultat ;
+        // On appelle "Personnage/List" sur le serveur (via son port), et on range le résultat dans le tableau qu'on avait prévu
+        resultat = restTemplate.getForObject("http://localhost:8081/Personnage/list", ArrayList.class);
+
+        //model.addAttribute("persons", listPersonnages);
+        // On cable sur le html pour l'affichage
+        model.addAttribute("persons", resultat);
+
+        //return listPersonnages;
+        return resultat;
     }
 
     @RequestMapping(value = { "/addPerson" }, method = RequestMethod.GET)
